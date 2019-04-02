@@ -1,1 +1,0 @@
-http://www-cs.ccny.cuny.edu/~wolberg/capstone/opencv/LearningOpenCV.pdf
