@@ -15,6 +15,8 @@ void onTrackbarSlide(int pos)
 
 int main(int argc,char** argv)
 {
+    //Example3 - Foto originale
+    //Example4-out - Foto dopo aver eseguito lo smoothing
     cvNamedWindow("Example3",CV_WINDOW_AUTOSIZE);
     cvNamedWindow("Example4-out",CV_WINDOW_AUTOSIZE);
 
