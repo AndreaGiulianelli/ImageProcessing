@@ -60,6 +60,7 @@ int main(int argc,char** argv)
         if(c==27) break;
     }
     //Usato per rilasciare le risorse
+    cvReleaseImage(&frame);
     cvReleaseCapture(&g_capture);
     cvDestroyWindow("Example3");
     cvDestroyWindow("Example4-out");
