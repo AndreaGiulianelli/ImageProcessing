@@ -21,6 +21,17 @@ int main(int argc,char** argv)
     int height = 50;
 
     int add = 150;
+    /*
+    -----PASSO TUTTA L'IMMAGINE E AGGIUNGO COLORE------
+    for(int y = 0;y < src->height;y++)
+    {
+        uchar* ptr = (uchar*)(src->imageData + y*src->widthStep);
+        for(int x = 0; x<src->width;x++)
+        {
+            ptr[3*x] = 255;
+        }
+    }*/
+
     cvSetImageROI(src,cvRect(x,y,width,height));
     cvAddS(src,cvScalar(add),src);
     cvResetImageROI(src);
