@@ -17,12 +17,15 @@ int main(int argc,char** argv)
     IplImage* src2 = cvLoadImage(argv[2]);
     IplImage* src1_gray = cvCreateImage(cvGetSize(src1), 8, 1);
     IplImage* src2_gray = cvCreateImage(cvGetSize(src2), 8, 1);
+    
+    //Trasformo le immagini da RGB a grayscale
     cvCvtColor(src1,src1_gray,CV_BGR2GRAY);
     cvCvtColor(src2,src2_gray,CV_BGR2GRAY);
     cvNamedWindow("Src1");
     cvNamedWindow("Src2");
     cvShowImage("Src1",src1_gray);
     cvShowImage("Src2",src2_gray);
+    //Faccio una compare rispetto ai pixel uguali e salvo il risultato in src1_gray
     cvCmp(src1_gray,src2_gray,src1_gray,CV_CMP_EQ);
 
     cvNamedWindow("Result");
