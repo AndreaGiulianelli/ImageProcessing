@@ -23,6 +23,10 @@ int main(int argc,char** argv)
     //cvResizeWindow("Nome",larghezza,altezza)
     cvResizeWindow("Finestra",100,50);
 
+    //Per SPOSTARE una FINESTRA
+    //Mette l'angolo spostato in alto a destra alla posizione x,y
+    cvMoveWindow("Finestra",500,500);
+
 
     //CARICARE UN'IMMAGINE
     //IplImage* cvLoadImage(nome,iscolor = CV_LOAD_IMAGE_COLOR)
@@ -46,11 +50,27 @@ int main(int argc,char** argv)
 
 
     //MOSTRARE IMMAGINE
+    //cvShowImage(const char* nomeFinestra, const CvArr* image);
+    cvShowImage("Finestra",img);
+
+    //WAIT KEY
+    //Aspetta il tempo specificato in millisecondi come parametro 
+    //Se entro quel tempo è premuto un tasto, allora la funzione lo restituisce come parametro
+    //Altrimenti restituisce 0
+    //Se lo chiamo senza parametri, aspetta all'infinito finchè non viene premuto un tasto
+    cvWaitKey(1000);
+
+
+    //Rilasciare immagine
+    cvReleaseImage(img);
     
 
 
     //Quando creo una finestra devo anche deallocarla con la funzione cvDestroyWindow()
     cvDestroyWindow("Finestra");
+    //Deallocare e chiudere tutte le finestre in un solo colpo
+    //cvDestroyAllWindows()
+
 
 
 
