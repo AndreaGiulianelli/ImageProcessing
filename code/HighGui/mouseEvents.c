@@ -51,6 +51,7 @@ int main()
         IPL_DEPTH_8U,
         3
     );
+    //Setta tutti i pixel a 0 (nero)
     cvZero(image);
     IplImage* temp = cvCloneImage(image);
 
