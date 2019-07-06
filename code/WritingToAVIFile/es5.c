@@ -35,6 +35,9 @@ int main(int argc,char** argv)
     //Il secondo parametro è il video codec (Tramite CV_FOURCC riusciamo ad esprimerlo in quattro caratteri)    
     //MJPEG è un codec video in cui tutti i frame del video vengonno codificati come un immagine JPG
     //Formato AVI: CV_FOURCC('P','I','M','1')
+    //IL terzo parametro è il numero di fps
+    //Il quarto è la dimensione di ogni frame
+    //Il quinto indica se è a colori
     CvVideoWriter* writer = cvCreateVideoWriter(argv[2],CV_FOURCC('M','J','P','G'),fps,size,1);
     IplImage* logpolar_frame = cvCreateImage(size,IPL_DEPTH_8U,3);
 
