@@ -19,9 +19,18 @@ int main()
         - 0 - Quando ho solo una camera, altrimenti il numero di camera da selezionare
         - Diverse costanti che selezionano l'ingresso pag.119
 
+    */
+
+
+   /*
+        Leggere un video
+        
+        int cvGrabFrame(CvCapture* capture);
+        IplImage* cvRetrieveFrame(CvCapture* capture);
+        IplImage* cvQueryFrame(CvCapture* capture);
+
         
 
-
-    */
+   */
     return 0;
 }
