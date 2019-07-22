@@ -43,6 +43,14 @@ int main(int argc,char** argv)
     IplImage* img = cvLoadImage(argv[1]);
     IplImage* img_dst = cvCreateImage(cvGetSize(img),IPL_DEPTH_8U,1);
 
+
+    //Trasformo le immagini da RGB a grayscale
+    cvCvtColor(src1,src1_gray,CV_BGR2GRAY);
+    cvCvtColor(src2,src2_gray,CV_BGR2GRAY);
+
+    //Faccio una compare rispetto ai pixel uguali e salvo il risultato in src1_gray
+    cvCmp(src1_gray,src2_gray,src1_gray,CV_CMP_EQ);
+
     //SALVARE UN'IMMAGINE
     //int cvSaveImage(nome,CvArr* image)
     //Ritorna 1 se il salvataggio è stato eseguito correttamente, 0 in caso contrario
