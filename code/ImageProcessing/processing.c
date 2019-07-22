@@ -76,7 +76,69 @@ int main(int argc,char** argv)
             int* values = NULL)
         (PAG. 135)
 
+        Quando si lavora con maschere o immagini booleane le operazioni di dilatazione o erosione
+        sono spesso suffiecienti.
+        Per le immagini grayscale o a colori si utilizzano tante altre operazioni tutte gestite da:
+
+        void cvMorphologyEx(
+            const CvArr* src,
+            CvArr* dst,
+            CvArr* temp,
+            IplConvKernel* element
+            int operation,
+            int iteration = 1
+        )
+        temp è un'array che deve avere la stessa dimensione di src.. e serve solo con alcune operazioni
+        La lista delle operazioni e se necessitano dell'array è a pag. 136
+
+
+        -OPENING / CLOSING
+            CV_MOP_OPEN / CV_MOP_CLOSE
+            OPEN: effettua prima un'erosione poi una dilatazione
+                  Praticamente viene spesso utilizzato quando dobbiamo analizzare un'immagine al microscopio
+                  e si devono contare le cellule...
+                  Open viene utilizzato per separare le cellule prima di contarle
+                  Vengono rimosse le piccole zone luminose
+            CLOSE: effetua prima una dilatazione poi un erosione
+                    Viene utilizzato per ridurre il rumore nelle componenti connesse
+                    Vengono unite le zone luminose
+
+        -Gradiente
+            gradient(src) = dilate(src) - erode(src)
+            Si usa solitamente per isolare il perimetro degli oggetti (rendendolo luminoso) in modo da trattarle come un unico oggetto
         
+
+        -Top Hat / Black Hat
+            Servono per isolare rispettivamente aree luminose o scure rispetto ai pixel vicini
+            Si usano per oggetti che esibiscono cambi di luminosità.
+            
+            TopHat(src) = src - open(src)
+            BlackHat(src) = close(src) - src
+
+        
+
+        FLOOD FILL
+        Questa funzione viene utilizzata per isolare porzioni di immagini da utilizzare più tardi
+        Si può utilizzare anche per creare maschere da immagini in input
+        Praticamente colora una zona di pixel che rientrano in uno specifico range
+
+        void cvFloodFill(
+            IplImage* img,
+            CvPoint seedPoint,
+            CvScalar newVal,
+            CvScalar loDiff = cvScalarAll(0),
+            CvScalar upDiff = cvScalarAll(0),
+            CvConnectedComp* comp = NULL,
+            int flags = 4,
+            CvArr* mask = NULL
+        )
+
+        
+
+        
+
+
+
 
    */
     
