@@ -200,13 +200,13 @@ int main(int argc,char** argv)
 */  
         IplImage* img_star = cvLoadImage("star.jpg");
         IplImage* img_topHat = cvCreateImage(cvSize(img_star->width,img_star->height),img_star->depth,img_star->nChannels);
-        cvMorphologyEx(img_star,img_topHat,NULL,structuring_element,CV_MOP_TOPHAT);
+        cvMorphologyEx(img_star,img_topHat,NULL,structuring_element,CV_MOP_BLACKHAT);
 
 
         cvNamedWindow("Star");
-        cvNamedWindow("Star TopHat");
+        cvNamedWindow("Star BlackHat");
         cvShowImage("Star",img_star);
-        cvShowImage("Star TOPHAT",img_topHat);
+        cvShowImage("Star BlackHat",img_topHat);
         cvWaitKey();
 
 /*
@@ -229,7 +229,43 @@ int main(int argc,char** argv)
         )
    */
 
+  /*
+        RESIZE
+        A volte abbiamo la necessita di convertire l'immagine in un'altra di dimensione diversa.
+        Oppure vogliamo fare un zoom in/out.
+        Per fare entrambe le cose si può usare cvResize()
+        Questa funzione metterà l'immagine sorgente esattamente dentro le dimensioni dell'immagine di destinazione
+        Se abbiamo impostato il ROI dentro l'immagine sorgente, il ROI verrà ridimensionato per mantere il suo significato,
+        se invece il ROI è settato nell'immagine di destinazione, allora l'immagine sorgente verrà ridimensionata all'interno del ROI
 
+        void cvResize(
+            const CvArr*    src,
+            CvArr*          dst,
+            int             interpolation = CV_INTER_LINEAR
+        );
+
+        L'ultimo argomento è il modo di interpolazione, le altre opzioni sono:
+        - CV_INTER_NN       Nearest neighbor
+        - CV_INTER_LINEAR   Bilinear
+        - CV_INTER_AREA     Pixel area re-sampling
+        - CV_INTER_CUBIC    Bicubic interpolation (La più utilizzata, ma non è sempre la più giusta... dipende dalla situazione)
+
+        https://www.youtube.com/watch?v=AqscP7rc8_M&t=454s
+        https://www.youtube.com/watch?v=poY_nGzEEWM
+
+  */
+
+
+    IplImage* img_beforeResize = cvLoadImage("whiteRectBlackHole.jpg",CV_LOAD_IMAGE_GRAYSCALE);
+    IplImage* img_afterResize = cvCreateImage(cvSize(img_beforeResize->width * 2,img_beforeResize->height * 2),img_beforeResize->depth,img_beforeResize->nChannels);
+    cvResize(img_beforeResize,img_afterResize);
+    cvNamedWindow("Before Resize");
+    cvNamedWindow("After Resize");
+    cvShowImage("Before Resize",img_beforeResize);
+    cvShowImage("After Resize",img_afterResize);
+    
+
+    
     cvWaitKey();
     cvReleaseImage(&img_dilation);
     cvReleaseImage(&img);
@@ -237,6 +273,8 @@ int main(int argc,char** argv)
     cvReleaseImage(&img_post_dilation);
     cvReleaseImage(&img_star);
     cvReleaseImage(&img_topHat);
+    cvReleaseImage(&img_beforeResize);
+    cvReleaseImage(&img_afterResize);
     cvDestroyWindow("Immagine");
     cvDestroyWindow("Immagine Dilatata");
     cvDestroyWindow("Immagine Erosa");
