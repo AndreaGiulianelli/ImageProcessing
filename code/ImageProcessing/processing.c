@@ -249,6 +249,8 @@ int main(int argc,char** argv)
         - CV_INTER_LINEAR   Bilinear
         - CV_INTER_AREA     Pixel area re-sampling
         - CV_INTER_CUBIC    Bicubic interpolation (La più utilizzata, ma non è sempre la più giusta... dipende dalla situazione)
+                            Bicubic interpolation viene utilizzata quando la velocità di esecuzione non è un problema (Quindi un video)
+
 
         https://www.youtube.com/watch?v=AqscP7rc8_M&t=454s
         https://www.youtube.com/watch?v=poY_nGzEEWM
@@ -264,6 +266,57 @@ int main(int argc,char** argv)
     cvShowImage("Before Resize",img_beforeResize);
     cvShowImage("After Resize",img_afterResize);
     
+
+
+    /*
+        IMAGE PYRAMIDS
+
+        Una piramide di immagini è una collezione di immagini tutte derivanti da una singola immagine.
+        Sono ridotte di risoluzione fino alla dimensione desiderata, anche un singolo pixel!
+        Ci sono due tipi di piramidi: 
+        - Gaussian: usata per fare il downsample di immagini
+        - Laplacian: è necessaria quando vogliamo ricostruire una immagine soprastante nella piramide a partire da un immagine piu un basso
+
+        void cvPyrDown(
+            IplImage* src,
+            IplImage* dst,
+            IplFilter filter = IPL_GAUSSIAN_5x5
+        );
+
+        Possiamo anche trasformare un immmagine che è il doppio più grande in larghezza e altezza
+
+        void cvPyrUp(
+            IplImage* src,
+            IplImage* dst,
+            IPlFilter filter = IPL_GAUSSIAN_5x5
+        );
+
+        In this case the image is fi rst upsized to twice the original in each dimension, with the
+        new (even) rows fi lled with 0s. Thereafter, a convolution is performed with the given
+        filter (actually, a fi lter twice as large in each dimension than that specified*) to approxi-
+        mate the values of the “missing” pixels.
+        We noted previously that the operator PyrUp() is not the inverse of PyrDown() . This
+        should be evident because PyrDown() is an operator that loses information. In order to
+        restore the original (higher-resolution) image, we would require access to the informa-
+        tion that was discarded by the downsampling.
+    */
+
+    IplImage* img_beforePyrDown = cvLoadImage("red_eyes.jpg");
+    cvNamedWindow("ImageBedorePyrDown");
+    cvShowImage("ImageBedorePyrDown",img_beforePyrDown);
+    IplImage* img_PyrDown = cvCreateImage(cvSize(img_beforePyrDown->width / 2,img_beforePyrDown->height / 2),img_beforePyrDown->depth,img_beforePyrDown->nChannels);
+    cvPyrDown(img_beforePyrDown,img_PyrDown);
+    cvNamedWindow("ImagePyrDown");
+    cvShowImage("ImagePyrDown",img_PyrDown);
+
+    IplImage* img_PyrUp = cvCreateImage(cvSize(img_beforePyrDown->width,img_beforePyrDown->height),img_beforePyrDown->depth,img_beforePyrDown->nChannels);
+    cvPyrUp(img_PyrDown,img_PyrUp);
+    cvNamedWindow("ImagePyrUp");
+    cvShowImage("ImagePyrUp",img_PyrUp); //Da notare l'effetto della convulazione del kernel che crea l'effetto blur
+
+    
+
+
 
     
     cvWaitKey();
