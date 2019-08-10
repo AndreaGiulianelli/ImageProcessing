@@ -291,14 +291,23 @@ int main(int argc,char** argv)
             IPlFilter filter = IPL_GAUSSIAN_5x5
         );
 
-        In this case the image is fi rst upsized to twice the original in each dimension, with the
-        new (even) rows fi lled with 0s. Thereafter, a convolution is performed with the given
-        filter (actually, a fi lter twice as large in each dimension than that specified*) to approxi-
+        In this case the image is first upsized to twice the original in each dimension, with the
+        new (even) rows filled with 0s. Thereafter, a convolution is performed with the given
+        filter (actually, a filter twice as large in each dimension than that specified*) to approxi-
         mate the values of the “missing” pixels.
         We noted previously that the operator PyrUp() is not the inverse of PyrDown() . This
         should be evident because PyrDown() is an operator that loses information. In order to
         restore the original (higher-resolution) image, we would require access to the informa-
         tion that was discarded by the downsampling.
+
+        Le piramidi di Laplace funzionano cosi
+        L1 = g1 - EXPAND[g2]
+        L2 = g2 - EXPAND[g3]
+
+        Praticamente ogni livello della piramide di Laplace è dato dalla differenza
+        tra il livello i-1 e il livello i della piramide di gauss (che ovviamente avrà i contorni più sfuocati a 
+        causa della convulazione). 
+        Perciò le piramidi di Laplace definiscono un po' i contorni di un'immagine 
     */
 
     IplImage* img_beforePyrDown = cvLoadImage("red_eyes.jpg");
@@ -311,14 +320,56 @@ int main(int argc,char** argv)
 
     IplImage* img_PyrUp = cvCreateImage(cvSize(img_beforePyrDown->width,img_beforePyrDown->height),img_beforePyrDown->depth,img_beforePyrDown->nChannels);
     cvPyrUp(img_PyrDown,img_PyrUp);
+
+    IplImage* firstLevelLaplace = cvCreateImage(cvSize(img_beforePyrDown->width,img_beforePyrDown->height),img_beforePyrDown->depth,img_beforePyrDown->nChannels);
+    cvSub(img_beforePyrDown,img_PyrUp,firstLevelLaplace);
+
     cvNamedWindow("ImagePyrUp");
     cvShowImage("ImagePyrUp",img_PyrUp); //Da notare l'effetto della convulazione del kernel che crea l'effetto blur
+    cvNamedWindow("FirstLevelLaplace");
+    cvShowImage("FirstLevelLaplace",firstLevelLaplace); //Si nota che Laplace definisce i bordi dell'immagine   
+
 
     
 
+    /*  
+        THRESHOLD
+
+        double cvThreshold(
+            CvArr* src,
+            CvArr* dst,
+            double threshold,
+            double max_value,
+            int threshold_type
+        );
+
+        Tipi di threshold (M = max_value):
+
+        CV_THRESH_BINARY        dst(i) = (src(i) > T) ? M : 0
+        CV_THRESH_BINARY_INV    dst(i) = (src(i) > T) ? 0 : M
+        CV_THRESH_TRUNC         dst(i) = (src(i) > T) ? M : src(i)
+        CV_THRESH_TOZERO_INV    dst(i) = (src(i) > T) ? 0 : src(i)
+        CV_THRESH_TOZERO        dst(i) = (src(i) > T) ? src(i) : 0
+
+    */
+
+    //Sommo tutti e tre i canali di un'immagine in un'immagine bianco e nero
+    IplImage* r = cvCreateImage(cvGetSize(img_beforePyrDown),IPL_DEPTH_8U,1);
+    IplImage* g = cvCreateImage(cvGetSize(img_beforePyrDown),IPL_DEPTH_8U,1);
+    IplImage* b = cvCreateImage(cvGetSize(img_beforePyrDown),IPL_DEPTH_8U,1);
+
+    cvSplit(img_beforePyrDown,r,g,b,NULL);
+
+    IplImage* s = cvCreateImage(cvGetSize(img_beforePyrDown),IPL_DEPTH_8U,1);
+    cvAddWeighted(r,1./3.,g,1./3.,0.0,s);
+    cvAddWeighted(s,2./3.,b,1.3/3.,0.0,s);
+
+    IplImage* dstThreshold = cvCreateImage(cvGetSize(img_beforePyrDown),IPL_DEPTH_8U,1);
+    cvShowImage("Weighted",s);
+    cvThreshold(s,dstThreshold,100,255,CV_THRESH_BINARY);
+    cvShowImage("Threshold",dstThreshold);
 
 
-    
     cvWaitKey();
     cvReleaseImage(&img_dilation);
     cvReleaseImage(&img);
@@ -328,11 +379,13 @@ int main(int argc,char** argv)
     cvReleaseImage(&img_topHat);
     cvReleaseImage(&img_beforeResize);
     cvReleaseImage(&img_afterResize);
+    cvReleaseImage(&firstLevelLaplace);
     cvDestroyWindow("Immagine");
     cvDestroyWindow("Immagine Dilatata");
     cvDestroyWindow("Immagine Erosa");
     cvDestroyWindow("Star");
     cvDestroyWindow("Star TOPHAT");
+    cvDestroyWindow("FirstLevelLaplace");
     cvWaitKey();
     return 0;
 }
