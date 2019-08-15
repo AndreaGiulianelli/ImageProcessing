@@ -200,13 +200,13 @@ int main(int argc,char** argv)
 */  
         IplImage* img_star = cvLoadImage("star.jpg");
         IplImage* img_topHat = cvCreateImage(cvSize(img_star->width,img_star->height),img_star->depth,img_star->nChannels);
-        cvMorphologyEx(img_star,img_topHat,NULL,structuring_element,CV_MOP_BLACKHAT);
+        cvMorphologyEx(img_star,img_topHat,NULL,structuring_element,CV_MOP_TOPHAT);
 
 
         cvNamedWindow("Star");
-        cvNamedWindow("Star BlackHat");
+        cvNamedWindow("Star TopHat");
         cvShowImage("Star",img_star);
-        cvShowImage("Star BlackHat",img_topHat);
+        cvShowImage("Star TopHat",img_topHat);
         cvWaitKey();
 
 /*
@@ -364,10 +364,66 @@ int main(int argc,char** argv)
     cvAddWeighted(r,1./3.,g,1./3.,0.0,s);
     cvAddWeighted(s,2./3.,b,1.3/3.,0.0,s);
 
+    /*
+    Migliore di cvCvtColor(img_beforePyrDown,s,CV_BGR2GRAY);
+    perchè aggiungere tutti i colori pesati in modo equivalente mantiene maggiormente
+    i bordi dell'immagine e i dettagli
+    */
+
     IplImage* dstThreshold = cvCreateImage(cvGetSize(img_beforePyrDown),IPL_DEPTH_8U,1);
     cvShowImage("Weighted",s);
     cvThreshold(s,dstThreshold,100,255,CV_THRESH_BINARY);
     cvShowImage("Threshold",dstThreshold);
+
+
+
+
+
+    /*
+        ADAPTIVE THRESHOLD
+        E' una tecnica di threshold dove il livello di threshold si regola automaticamente.
+
+        void cvAdaptiveThreshold(
+            CvArr* src,
+            CvArr* dst,
+            double max_val,
+            int adaptive_method = CV_ADAPTIVE_THRESH_MEAN_C,
+            int threshold_type = CV_THRESH_BINARY,
+            int block_size = 3,
+            double param1 = 5
+        );
+    
+
+        permette due tipi di threshold adattivo dipendenti dal tipo che viene specificato
+        in adaptive_method.
+        In ogni caso fa una media pesata di un blocco di pixel (dimensione specificata dal block_size) 
+        attorno al pixel analizzato (x,y) e una costante
+        data da param1.
+
+        Se il metodo è settato su CV_ADAPTIVE_THRESH_MEAN_C allora tutti i pixel dell'area vengono pesati ugualmente
+        Se il metodo è settato su CV_ADAPTIVE_THRESH_GAUSSIAN_C allora i pixel attorno al pixel analizzato (x,y)
+        sono pesati in accordo alla funzione gaussiana rispetto alla distanza dal punto centrale.
+
+        Il threshold adattivo si rende necessario quando abbiamo situazioni in cui c'è una forte illuminazione o riflessi 
+        e abbiamo bisogno che il threshold sia relativo all'intensità del gradiente.
+        
+        Questa funzione lavora solo con immagini ad un canale e richiede che l'immagine sorgente e di destinazione 
+        siano distinte.
+
+    */
+
+    IplImage* img_scacchi = cvLoadImage("img_scacchi.png",0);
+    cvNamedWindow("Scacchi");
+    cvShowImage("Scacchi",img_scacchi);
+    IplImage* img_thresholdNormale = cvCreateImage(cvGetSize(img_scacchi),IPL_DEPTH_8U,1);
+    IplImage* img_thresholdAdattivo = cvCreateImage(cvGetSize(img_scacchi),IPL_DEPTH_8U,1);
+    cvThreshold(img_scacchi,img_thresholdNormale,100,255,CV_THRESH_BINARY);
+    cvNamedWindow("Threshold Normale");
+    cvShowImage("Threshold Normale",img_thresholdNormale);
+    cvAdaptiveThreshold(img_scacchi,img_thresholdAdattivo,255,CV_ADAPTIVE_THRESH_MEAN_C,CV_THRESH_BINARY,71,15);
+    cvNamedWindow("Threshold Adattivo");
+    cvShowImage("Threshold Adattivo",img_thresholdAdattivo);
+    
 
 
     cvWaitKey();
