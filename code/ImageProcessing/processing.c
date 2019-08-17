@@ -399,6 +399,8 @@ int main(int argc,char** argv)
         In ogni caso fa una media pesata di un blocco di pixel (dimensione specificata dal block_size) 
         attorno al pixel analizzato (x,y) e una costante
         data da param1.
+        Il treshold è dato dalla media dei pixel nell'area di dimensione specificata attorno al pixel analizzato
+        meno la costante data da param1
 
         Se il metodo è settato su CV_ADAPTIVE_THRESH_MEAN_C allora tutti i pixel dell'area vengono pesati ugualmente
         Se il metodo è settato su CV_ADAPTIVE_THRESH_GAUSSIAN_C allora i pixel attorno al pixel analizzato (x,y)
@@ -420,7 +422,7 @@ int main(int argc,char** argv)
     cvThreshold(img_scacchi,img_thresholdNormale,100,255,CV_THRESH_BINARY);
     cvNamedWindow("Threshold Normale");
     cvShowImage("Threshold Normale",img_thresholdNormale);
-    cvAdaptiveThreshold(img_scacchi,img_thresholdAdattivo,255,CV_ADAPTIVE_THRESH_MEAN_C,CV_THRESH_BINARY,71,15);
+    cvAdaptiveThreshold(img_scacchi,img_thresholdAdattivo,255,CV_ADAPTIVE_THRESH_MEAN_C,CV_THRESH_BINARY,51,15);
     cvNamedWindow("Threshold Adattivo");
     cvShowImage("Threshold Adattivo",img_thresholdAdattivo);
     
