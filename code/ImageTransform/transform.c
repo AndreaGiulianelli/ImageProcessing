@@ -96,16 +96,96 @@ int main(int argc,char** argv)
     cvSobel(imgGrayScale,imgSobel_x,1,0,3);
     cvSobel(imgGrayScale,imgSobel_y,0,1,3);
 
+    cvNamedWindow("SobelX");
+    cvNamedWindow("SobelY");
+    cvShowImage("SobelX",imgSobel_x);
+    cvShowImage("SobelY",imgSobel_y);
+
     //Cosi unisco sobel x e y
     cvAddWeighted(imgSobel_x,0.5,imgSobel_y,0.5,0.0,imgSobel);
     cvShowImage("Dst",imgSobel);
     cvWaitKey();
+    cvDestroyWindow("SobelX");
+    cvDestroyWindow("SobelY");
+    
+    /*
+        Scharr Filter
+        When the size of the kernel is 3, the Sobel kernel shown above may produce noticeable inaccuracies 
+        (after all, Sobel is only an approximation of the derivative).
+        OpenCV addresses this inaccuracy for kernels of size 3 by using the Scharr function. 
+        This is as fast but more accurate than the standar Sobel function.
+        Praticamente usa altri valori nel kernel.
+        
+        Per utilizzarlo occorre specificare come aperture_size il valore CV_SCHARR.
+        Quando si vuole utilizzare un kernel 3x3 conviene sempre utilizzare lo scharr.
+
+    */
+    cvSobel(imgGrayScale,imgSobel_x,1,0,CV_SCHARR);
+    cvSobel(imgGrayScale,imgSobel_y,0,1,CV_SCHARR);
+    cvAddWeighted(imgSobel_x,0.5,imgSobel_y,0.5,0.0,imgSobel);
+    cvShowImage("Dst",imgSobel);
+    cvWaitKey();
+
+    /*
+        Laplace
+        E' come una derivata seconda dell'immagine..
+        E' come un secondo ordine del Sobel, infatti internamente OpenCv usa il sobel dentro Laplace
+        
+        void cvLaplace(
+            const CvArr*    src,
+            CvArr*          dst,
+            int             aperture_size = 3
+        );
+
+        La sorgente puo essere 8-bit unsigned o 32-bit floating.
+        La destinazione deve essere 16-bit signed o 32-bit floating.
+
+
+    */
+
+    IplImage* imgLaplace = cvCreateImage(cvGetSize(imgGrayScale),IPL_DEPTH_8U,1);
+    cvLaplace(imgGrayScale,imgLaplace);
+    cvShowImage("Dst",imgLaplace);
+    cvWaitKey();
+
+
+    /*  
+        Canny
+        E' un metodo per trovare i bordi di un immagine.
+        E' solitamente chimato Canny edge detector.
+        Se un pixel ha un gradiente sopra l'upper threshold allora viene accettato.
+        Se è sotto viene scartato.
+        Se è in mezzo per essere accettato deve essere collegato ad un pixel che è sopra l'upper
+
+        void cvCanny(
+            const CvArr*    img,
+            CvArr*          edges,
+            double          lowThresh,
+            double          highThresh,
+            int             aperture_size = 3
+        );
+
+        L'immagine di input deve essere grayscale e l'output anche.
+        Spiegazione fatta bene:
+        https://www.youtube.com/watch?v=sRFM5IEqR2w&list=PLzH6n4zXuckoRdljSlM2k35BufTYXNNeF&index=3
+
+    */ 
+    IplImage* imgCanny = cvCreateImage(cvGetSize(imgGrayScale),IPL_DEPTH_8U,1);
+    cvCanny(imgGrayScale,imgCanny,50,100);
+    cvShowImage("Dst",imgCanny);
+    cvWaitKey();
+
+
 
     cvDestroyWindow("Src");
     cvDestroyWindow("Dst");
     cvReleaseImage(&img);
     cvReleaseImage(&imgDst);
     cvReleaseImage(&imgSobel);
+    cvReleaseImage(&imgSobel_x);
+    cvReleaseImage(&imgSobel_y);
+    cvReleaseImage(&imgLaplace);
+    cvReleaseImage(&imgCanny);
 
     
     return 0;
