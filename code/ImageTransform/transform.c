@@ -156,6 +156,7 @@ int main(int argc,char** argv)
         Se un pixel ha un gradiente sopra l'upper threshold allora viene accettato.
         Se è sotto viene scartato.
         Se è in mezzo per essere accettato deve essere collegato ad un pixel che è sopra l'upper
+        E' indipendente dalla risoluzione, crea un bordo definito indipendente dalla risoluzione.
 
         void cvCanny(
             const CvArr*    img,
