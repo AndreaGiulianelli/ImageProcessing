@@ -176,6 +176,56 @@ int main(int argc,char** argv)
     cvShowImage("Dst",imgCanny);
     cvWaitKey();
 
+    /*
+        Hough Transform
+        https://www.youtube.com/watch?v=G019Av7XhGo
+        https://www.uio.no/studier/emner/matnat/ifi/INF4300/h09/undervisningsmateriale/hough09.pdf
+        Coordinate Polari: https://www.youmath.it/formulari/formulari-di-geometria-analitica/456-sistema-di-coordinate-polari.html
+        
+        CvSeq* cvHoughLines2(
+            CvArr*  image,
+            void*   line_storage,
+            int     method,
+            double  rho,
+            double  theta,
+            int     threshold,
+            double  param1 = 0
+            double  param2 = 0
+        );
+
+        line_storage è un puntatore a dove il risultato deve essere memorizzato,
+        può essere un cvMemoryStorage oppure una matrice Nx1 (N diventa il massimo numero di linee ritornate).
+        Method può essere CV_HOUGH_STANDARD, CV_HOUGH_PROBABILISTIC, CV_HOUGH_MULTI_SCALE.
+        rho : The resolution of the parameter r in pixels. We use 1 pixel.
+        theta: The resolution of the parameter \theta in radians. We use 1 degree (CV_PI/180) perchè la conversione rad = (gradi * pi) / 180
+        threshold: The minimum number of intersections to “detect” a line
+        What the function returns depends on how it was called. If the line_storage value was
+        a matrix array, then the actual return value will be NULL. In this case, the matrix should
+        be of type CV_32FC2 if the SHT or multi-scale HT is being used and should be CV_32SC4 if
+        the PPHT is being used. In the first two cases, the ρ- and θ-values for each line will be
+        placed in the two channels of the array. In the case of the PPHT, the four channels will
+        hold the x- and y-values of the start and endpoints of the returned segments. In all of
+        these cases, the number of rows in the array will be updated by cvHoughLines2() to cor-
+        rectly reflect the number of lines returned.
+
+    */
+    IplImage* imgHough = cvLoadImage(argv[1],CV_LOAD_IMAGE_GRAYSCALE);
+    cvCanny(imgHough,imgHough,50,100);
+    /*CvMat line_storage;
+    cvInitMatHeader(&line_storage,10,1,CV_32FC2);*/
+    float line_storage[10][2] = {0};
+    //cvHoughLines2(imgHough,line_storage,CV_HOUGH_STANDARD,1,3.14/180,50);
+
+
+
+    float (*p)[2];
+    p = line_storage;
+    float i =0;
+    for(p = line_storage; p != (line_storage + 10);p++)
+    {
+        printf("%f\n",(*p)[0]);
+        
+    }
 
 
     cvDestroyWindow("Src");
