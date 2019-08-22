@@ -180,6 +180,7 @@ int main(int argc,char** argv)
         Hough Transform
         https://www.youtube.com/watch?v=G019Av7XhGo
         https://www.uio.no/studier/emner/matnat/ifi/INF4300/h09/undervisningsmateriale/hough09.pdf
+        https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/hough_lines/hough_lines.html
         Coordinate Polari: https://www.youmath.it/formulari/formulari-di-geometria-analitica/456-sistema-di-coordinate-polari.html
         
         CvSeq* cvHoughLines2(
@@ -211,23 +212,32 @@ int main(int argc,char** argv)
     */
     IplImage* imgHough = cvLoadImage(argv[1],CV_LOAD_IMAGE_GRAYSCALE);
     cvCanny(imgHough,imgHough,50,100);
-    /*CvMat line_storage;
-    cvInitMatHeader(&line_storage,10,1,CV_32FC2);*/
-    float line_storage[10][2] = {0};
-    //cvHoughLines2(imgHough,line_storage,CV_HOUGH_STANDARD,1,3.14/180,50);
+    CvMat* line_storage = cvCreateMat(10,1,CV_32FC2);
+    cvHoughLines2(imgHough,line_storage,CV_HOUGH_STANDARD,1,3.14/180,50);
+    //[0] è il rho
+    //[1] è theta
 
-
-
-    float (*p)[2];
-    p = line_storage;
-    float i =0;
-    for(p = line_storage; p != (line_storage + 10);p++)
+    for(int i=0;i<10;i++)
     {
-        printf("%f\n",(*p)[0]);
+        float* ptr = (float*) CV_MAT_ELEM_PTR(*line_storage,i,0);
+        printf("%f - %f\n",ptr[0],ptr[1]);
+        float rho = ptr[0];
+        float theta = ptr[1];
+
+        double a = cos(theta);
+        double b = sin(theta);
+        double x0 = a*rho;
+        double y0 = b*rho;
         
+        //Partendo da un punto mi calcolo due punti separati che stanno sulla stessa linea, in modo da disegnarla.
+        //https://answers.opencv.org/question/21132/draw-the-lines-detected-by-cvhoughlines/
+        CvPoint pt1 = CvPoint(cvRound(x0 + 1000 * (-b)), y0 + 1000* (a));
+        CvPoint pt2 = CvPoint(cvRound(x0 - 1000 * (-b)), y0 - 1000* (a));
+        cvLine(imgHough,pt1,pt2,CvScalar(255,255,255),2,8);
     }
 
-
+    cvShowImage("Dst",imgHough);
+    cvWaitKey();
     cvDestroyWindow("Src");
     cvDestroyWindow("Dst");
     cvReleaseImage(&img);
