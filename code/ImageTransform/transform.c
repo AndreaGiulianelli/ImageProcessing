@@ -3,6 +3,10 @@
 
 int main(int argc,char** argv)
 {
+
+
+
+
     /*
     Convolution
 
@@ -274,8 +278,17 @@ int main(int argc,char** argv)
 
     IplImage* imgHoughCircle = cvLoadImage(argv[1],CV_LOAD_IMAGE_GRAYSCALE);
     cvSmooth(imgHoughCircle,imgHoughCircle,CV_GAUSSIAN,5,5);
-    CvMat* circle_storage = cvCreateMat(20,1,CV_32FC3);
-    cvHoughCircles(imgHoughCircle,circle_storage,CV_HOUGH_GRADIENT,2,imgHoughCircle->width/10,150,10);
+    //CvMat* circle_storage = cvCreateMat(20,1,CV_32FC3);
+    CvMemStorage* storage = cvCreateMemStorage(0);
+    CvSeq* results = cvHoughCircles(imgHoughCircle,storage,CV_HOUGH_GRADIENT,1,imgHoughCircle->width/10,150,100,0,0);
+    
+    for(int i = 0;i< results->total; i++)
+    {
+        float* p = (float*) cvGetSeqElem(results,i);
+        CvPoint pt = CvPoint(cvRound(p[0]),cvRound(p[1]));
+        cvCircle(imgHoughCircle,pt,cvRound(p[2]),CV_RGB(0x00,0xff,0x00));
+    }
+
     cvShowImage("Dst",imgHoughCircle);
 
 
