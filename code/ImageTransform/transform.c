@@ -238,6 +238,50 @@ int main(int argc,char** argv)
 
     cvShowImage("Dst",imgHough);
     cvWaitKey();
+
+
+    /*
+        Hough Circle Transform
+        In openCv utilizza una tecnica chiamata Hough gradient method.
+        Funziona in questo modo: 
+        Prima l'immagine viene fatta passare in un filtro di edge detenction (Ex. Canny).
+        Dopodichè per ogni punto non-nero viene considerato il gradiente locale (facendo una Sobel x e y)
+        Usando questo gradiente, ogni punto lungo la linea indicata dalla sua pendenza viene incrementato l'accomulatore.
+        Allo stesso tempo tutti i punti a zero sono segnati perche potrebbero essere il centro del cerchio.
+
+
+        CvSeq* cvHoughCircles(
+            CvArr*  image,
+            void*   circle_storage,
+            int     method,
+            double  dp,
+            double  min_dist,
+            double  param1,
+            double  param2,
+            int     min_radius = 0
+            int     max_radius = 0
+        );
+
+        se come metodo di storage usiamo un array, deve essere di tipo CV_32FC3.
+        dp è la risoluzione dell'accomulatore, cioè di dove cerca i cerchi: 
+        -   1: mantiene la stessa risoluzione
+        -   numero piu alto: viene ridotta di quel fattore x.
+
+        min_dist è la minima distanza che può esistere tra due cerchi al fine di farli considerare dall'algoritmo come distinti
+        Impostando come metodo CV_HOUGH_GRADIENT i parametri param1 e param2 sono i due threshold, il primo del canny il secondo dell'accomulatore
+
+    */
+
+    IplImage* imgHoughCircle = cvLoadImage(argv[1],CV_LOAD_IMAGE_GRAYSCALE);
+    cvSmooth(imgHoughCircle,imgHoughCircle,CV_GAUSSIAN,5,5);
+    CvMat* circle_storage = cvCreateMat(20,1,CV_32FC3);
+    cvHoughCircles(imgHoughCircle,circle_storage,CV_HOUGH_GRADIENT,2,imgHoughCircle->width/10,150,10);
+    cvShowImage("Dst",imgHoughCircle);
+
+
+
+    
+    cvWaitKey();
     cvDestroyWindow("Src");
     cvDestroyWindow("Dst");
     cvReleaseImage(&img);
@@ -247,6 +291,8 @@ int main(int argc,char** argv)
     cvReleaseImage(&imgSobel_y);
     cvReleaseImage(&imgLaplace);
     cvReleaseImage(&imgCanny);
+    cvReleaseImage(&imgHough);
+    cvReleaseImage(&imgHoughCircle);
 
     
     return 0;
