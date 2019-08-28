@@ -298,6 +298,67 @@ int main(int argc,char** argv)
     }
 
     cvShowImage("Dst",imgHoughCircleNormal);
+    cvWaitKey();
+
+    /*
+    Remap
+
+    Il remapping é un processo che serve a prendere i pixel da un immagine e metterli in un altro
+    posto nella nuova immagine.
+    Ovviamente potrebbe essere necessario un interpolazione perché non sempre c'é una corrispondenza
+    uno a uno con la sorgente e la destinazione.
+
+    g(x,y) = f(h(x,y))
+    g é l'immagine rimappata, f é l'immagine sorgente e h(x,y) é la funzione di mapping che opera su (x,y)
+
+
+    void cvRemap(
+        const CvArr* src,
+        CvArr*       dst,
+        const CvArr* mapx,
+        const CvArr* mapy,
+        int          flags = CV_INTER_LINER | CV_WARP_FILL_OUTLIERS,
+        CvScalar     fillval = cvScalarAll(0)
+    );
+
+    mapx e mapy indica dove ogni pixel deve essere rilocato.
+    La dimensione deve essere la stessa di src e dst... peró é single-channel,
+    e solitamente di tipo float : IPL_DEPTH_32F
+
+    le flags possono essere : 
+    - CV_INTERN_NN          Nearest neighbor
+    - CV_INTER_LINEAR       Bilinear(default)
+    - CV_INTER_AREA         Pixel area resampling
+    - CV_INTER_CUBIC        Bicubic interpolation
+
+    You may also add (using the OR operator) the flag CV_WARP_FILL_OUTLIERS, whose effect
+    is to fi ll pixels in the destination image that are not the destination of any pixel in the
+    input image with the value indicated by the fi nal argument fillval. In this way, if you
+    map all of your image to a circle in the center then the outside of that circle would auto-
+    matically be filled with black (or any other color that you fancy).
+    */
+
+    IplImage* img_srcRemap = cvLoadImage(argv[1]);
+    IplImage* img_dstRemap = cvCreateImage(cvGetSize(img_srcRemap),img_srcRemap->depth,img_srcRemap->nChannels);
+    CvMat* mapx = cvCreateMat(img_srcRemap->height,img_srcRemap->width,CV_32FC1);
+    CvMat* mapy = cvCreateMat(img_srcRemap->height,img_srcRemap->width,CV_32FC1);
+
+    for(int i=0; i<img_srcRemap->height;i++)
+    {
+        for(int j=0;j<img_srcRemap->width;j++)
+        {
+            //Prestare attenzione al fatto che il punto 0,0 non é in basso a sinistra ma
+            //in alto a sinistra.
+            *((float*)CV_MAT_ELEM_PTR(*mapx,i,j)) = j;
+            *((float*)CV_MAT_ELEM_PTR(*mapy,i,j)) = img_srcRemap->height - i;
+        }
+    }
+
+    cvRemap(img_srcRemap,img_dstRemap,mapx,mapy);
+    cvShowImage("Dst",img_dstRemap);
+    cvWaitKey();
+
+
 
 
 
@@ -314,6 +375,9 @@ int main(int argc,char** argv)
     cvReleaseImage(&imgCanny);
     cvReleaseImage(&imgHough);
     cvReleaseImage(&imgHoughCircle);
+    cvReleaseImage(&img_srcRemap);
+    cvReleaseImage(&img_dstRemap);
+
     cvReleaseMemStorage(&storage); //Libero la memoria allocata con cvCreateMemStorage
 
     

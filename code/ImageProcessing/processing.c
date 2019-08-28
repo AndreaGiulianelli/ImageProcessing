@@ -254,6 +254,7 @@ int main(int argc,char** argv)
 
         https://www.youtube.com/watch?v=AqscP7rc8_M&t=454s
         https://www.youtube.com/watch?v=poY_nGzEEWM
+        https://northstar-www.dartmouth.edu/doc/idl/html_6.2/Interpolation_Methods.html
 
   */
 
