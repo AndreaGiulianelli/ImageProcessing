@@ -311,6 +311,9 @@ int main(int argc,char** argv)
     g(x,y) = f(h(x,y))
     g é l'immagine rimappata, f é l'immagine sorgente e h(x,y) é la funzione di mapping che opera su (x,y)
 
+    Vari tipi di Remap: 
+    https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/remap/remap.html
+    https://www.peeknpoke.net/single-post/2016/10/29/OpenCV-remap-function
 
     void cvRemap(
         const CvArr* src,
@@ -357,6 +360,24 @@ int main(int argc,char** argv)
     cvRemap(img_srcRemap,img_dstRemap,mapx,mapy);
     cvShowImage("Dst",img_dstRemap);
     cvWaitKey();
+
+    /*
+        Le funzioni che permettono di stretchare, contorcere, contrarre o ruotare un'immagine
+        sono dette geometric transform...
+        Per superfici planari, ci sono due tipi di trasformazioni geometriche...
+        - una usa una matrice 2x3: affine transforms
+        - una usa una matrice 3x3: perspective transforms o homographies..
+
+        Le transformazioni affini sono qualsiasi composizione di una applicazione lineare L con una
+        translazione
+        Esempi di affinitá sono le rotazioni, omotetie, translazioni, rototranslazioni, riflessioni.
+        Le affinitá non sono necessariamnete isometrie, non preservano cioé angoli e distanze, mentre
+        mantengono sempre il parallelismo tra le rette.
+
+        https://homepages.inf.ed.ac.uk/rbf/HIPR2/affine.htm
+        Spiegazione Coordinate Proiettive: http://www.sci.utah.edu/~acoste/uou/Image/project3/ArthurCOSTE_Project3.pdf
+        
+    */
 
 
 
