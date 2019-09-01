@@ -336,7 +336,7 @@ int main(int argc,char** argv)
 
     You may also add (using the OR operator) the flag CV_WARP_FILL_OUTLIERS, whose effect
     is to fi ll pixels in the destination image that are not the destination of any pixel in the
-    input image with the value indicated by the fi nal argument fillval. In this way, if you
+    input image with the value indicated by the final argument fillval. In this way, if you
     map all of your image to a circle in the center then the outside of that circle would auto-
     matically be filled with black (or any other color that you fancy).
     */
@@ -376,7 +376,43 @@ int main(int argc,char** argv)
 
         https://homepages.inf.ed.ac.uk/rbf/HIPR2/affine.htm
         Spiegazione Coordinate Proiettive: http://www.sci.utah.edu/~acoste/uou/Image/project3/ArthurCOSTE_Project3.pdf
+        Spiegazione trasformazioni affini semplice: http://www.frattali.it/trasformazioniaffini.htm
         
+        
+        DENSE AFFINE TRANSFORMATION
+        Sono transformazioni affini, in cui l'immagine di destinazione (quella deformata)
+        deve apparire naturale e lineare..
+        Perció dopo aver effettuato la trasfomazione é necessario effettuare dell'interpolazione
+
+        void cvWarpAffine(
+            const CvArr* src,
+            CvArr* dst,
+            const CvMat** map_matrix,
+            int flags = CV_INTER_LINEAR | CV_WARP_FILL_OUTLINERS,
+            CvScalar fillval = cvScalarAll(0)
+        );
+
+        map_matrix é la matrice 2x3 necessaria per applicare la transformazione affine.
+        Gli ultimi due argomenti controllano l'interpolazione.
+        Ci sono anche dei flags addizionali (di solito aggiunti con degli OR) :
+        - CV_WARP_FILL_OUTLIERS: é lo stesso che si usava per il Remap
+        - CV_WARP_INVERSE_MAP: praticemte il warp (la distorsione) avviene al contrario..
+                               invece che dall'src al dst, avviene dalla dst all'src.
+
+        cvWarpAffine é un'operazione che impiega parecchie risorse e presenta un'overhead elevato rispetto
+        alla semplice trasformazione affine..
+        Perció per effettuare una semplice transformazione affine su un immagine adf 8 bit per canale in sorgente
+        e 32 bit per canale di destinazione, possiamo usare:
+
+        void cvGetQuadrangleSubPix(
+            const CvArr* src,
+            CvArr* dst,
+            const CvMat** map_matrix
+        );
+
+        Questa funzione effettua anche l'interpolazione.
+
+
     */
 
 
