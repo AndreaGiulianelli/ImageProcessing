@@ -372,7 +372,9 @@ int main(int argc,char** argv)
         translazione
         Esempi di affinitá sono le rotazioni, omotetie, translazioni, rototranslazioni, riflessioni.
         Le affinitá non sono necessariamnete isometrie, non preservano cioé angoli e distanze, mentre
-        mantengono sempre il parallelismo tra le rette.
+        mantengono sempre il PARALLELISMO tra le rette.
+        Perció sono per i parallelogrammi, e bastano tre punti per generare la matrice della trasfomazione affine,
+        in quanto vengono mantenuti i parallelismi tra rette.
 
         https://homepages.inf.ed.ac.uk/rbf/HIPR2/affine.htm
         Spiegazione Coordinate Proiettive: http://www.sci.utah.edu/~acoste/uou/Image/project3/ArthurCOSTE_Project3.pdf
@@ -401,7 +403,7 @@ int main(int argc,char** argv)
 
         cvWarpAffine é un'operazione che impiega parecchie risorse e presenta un'overhead elevato rispetto
         alla semplice trasformazione affine..
-        Perció per effettuare una semplice transformazione affine su un immagine adf 8 bit per canale in sorgente
+        Perció per effettuare una semplice transformazione affine su un immagine a 8 bit per canale in sorgente
         e 32 bit per canale di destinazione, possiamo usare:
 
         void cvGetQuadrangleSubPix(
@@ -413,13 +415,108 @@ int main(int argc,char** argv)
         Questa funzione effettua anche l'interpolazione.
 
 
+        OpenCv provvede due funzioni per generare la matrice.
+        La prima é per quando abbiamo due immagini che sono in relazione per qualche trasformazione affine
+        o sappiamo in che modo vogliamo trasformarle partendo da due punti.
+
+        CvMat* cvGetAffineTransform(
+            const CvPoint2D32f*     pts_src,
+            const CvPoint2D32f*     pts_dst,
+            CvMat*                  map_matrix
+        );
+
+        pts_src e dst sono array di tre punti bidimensionali (x,y) 
+
+        Il secondo modo per ottenere la map_matrix é tramite cv2DRotationMatrix()
+        praticamente permette di ottenere la matrice per effettuare una rotazione attorno 
+        ad uno specifico punto, di uno specifico angolo e addirittura di effettuare un'eventuale scaling
+
+        CvMat* cv2DRotationMatrix(
+            CvPoint2D32f    center,
+            double          angle,
+            double          scale,
+            CvMat*          map_matrix
+        );
+
+        center é il punto centrale di rotazione.
+        angle é l'angolo di rotazione, e scale é l'eventuale rescaling.
+    */
+
+    CvPoint2D32f srcTri[3],dstTri[3];
+    CvMat* rot_mat = cvCreateMat(2,3,CV_32FC1);
+    CvMat* warp_mat = cvCreateMat(2,3,CV_32FC1);
+    IplImage* src;
+    IplImage* dst;
+
+    src = cvLoadImage(argv[1]);
+    dst = cvCloneImage(src);
+    dst->origin = src->origin;
+    cvZero(dst);
+
+    //Warp matrix
+
+   srcTri[0].x = 0;
+   srcTri[0].y = 0;
+   srcTri[1].x = src->width - 1;
+   srcTri[1].y = 0;
+   srcTri[2].x = 0;
+   srcTri[2].y = src->height - 1;
+
+    dstTri[0].x = 0;
+    dstTri[0].y = src->height*0.33;
+    dstTri[1].x = src->width*0.85;
+    dstTri[1].y = src->height*0.25;
+    dstTri[2].x = src->width*0.15;
+    dstTri[2].y = src->height*0.7;
+
+    cvGetAffineTransform(srcTri,dstTri,warp_mat);
+    cvWarpAffine(src,dst,warp_mat);
+    cvShowImage("Dst",dst);
+    cvWaitKey();
+    
+    cvCopy(dst,src);
+
+    //Rotation Matrix
+
+    CvPoint2D32f center = cvPoint2D32f(src->width / 2,src->height / 2);
+    double angle = -50.0;
+    double scale = 0.6;
+    cv2DRotationMatrix(center,angle,scale,rot_mat);
+    cvWarpAffine(src,dst,rot_mat);
+    cvShowImage("Dst",dst);
+    cvWaitKey();
+
+    /*
+        Per effettuare la transformazione di una lista di punti, si puó usare la funzione cvTrasform()
+
+        void cvTransform(
+            const CvArr*    src,
+            CvArr*          dst,
+            const CvMat*    transmat,
+            const CvMat*    shiftvec = NULL
+        );
+
+        In general, src is an N-by-1 array with Ds channels, where N is the number of points to
+        be transformed and Ds is the dimension of those source points. The output array dst
+        must be the same size but may have a different number of channels, Dd . 
+        The transformation matrix transmat is a Ds-by-Dd matrix that is then applied to every element of src,
+        after which the results are placed into dst . The optional vector shiftvec, if non-NULL, must
+        be a Ds-by-1 array, which is added to each result before the result is placed in dst.
+        In our case of an affine transformation, there are two ways to use cvTransform() that
+        depend on how we’d like to represent our transformation. In the fi rst method, we decompose
+        our transformation into the 2-by-2 part (which does rotation, scaling, and
+        warping) and the 2-by-1 part (which does the transformation). Here our input is an
+        N-by-1 array with two channels, transmat is our local homogeneous transformation,
+        and shiftvec contains any needed displacement. The second method is to use our usual
+        2-by-3 representation of the affi ne transformation. In this case the input array src is a
+        three-channel array within which we must set all third-channel entries to 1 (i.e., the
+        points must be supplied in homogeneous coordinates). Of course, the output array will
+        still be a two-channel array.
+
     */
 
 
 
-
-
-    
     cvWaitKey();
     cvDestroyWindow("Src");
     cvDestroyWindow("Dst");
@@ -434,6 +531,8 @@ int main(int argc,char** argv)
     cvReleaseImage(&imgHoughCircle);
     cvReleaseImage(&img_srcRemap);
     cvReleaseImage(&img_dstRemap);
+    cvReleaseImage(&src);
+    cvReleaseImage(&dst);
 
     cvReleaseMemStorage(&storage); //Libero la memoria allocata con cvCreateMemStorage
 
