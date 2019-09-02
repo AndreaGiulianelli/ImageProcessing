@@ -574,6 +574,37 @@ int main(int argc,char** argv)
    */
 
 
+    /*
+        LOG-POLAR TRANSFORM
+
+        Spiegazione log-polar: https://sthoduka.github.io/imreg_fmt/docs/log-polar-transform/        
+
+        void cvLogPolar(
+            const CvArr*    src,
+            CvArr*          dst,
+            CvPoint2D32f    center,
+            double          m,
+            int             flags = CV_INTER_LINEAR | CV_WARP_FILL_OUTLIERS
+        );
+
+        Le immagini sorgente e destinazione possono essere ad uno / tre canali a colori o grayscale.
+        Center indica il punto centrale della trasformazione log-polar.
+        m é il fattore di scala da dare a rho.
+        Se voglio passare da logPolar a cartesiane devo mettere al posto di CV_WARP_FILL_OUTLIERS, CV_WARP_INVERSE_MAP.
+
+    */
+
+    IplImage* imgCartesian = cvLoadImage(argv[1]);
+    imgCartesian->origin = 0; //Origine nel punto top-left
+    IplImage* imgLogPolar = cvCreateImage(cvGetSize(imgCartesian),imgCartesian->depth,imgCartesian->nChannels);
+    IplImage* imgInverseLogPolar = cvCreateImage(cvGetSize(imgCartesian),imgCartesian->depth,imgCartesian->nChannels);
+    cvLogPolar(imgCartesian,imgLogPolar,cvPoint2D32f(0,0),50);
+    cvLogPolar(imgLogPolar,imgInverseLogPolar,cvPoint2D32f(0,0),50,CV_INTER_LINEAR | CV_WARP_INVERSE_MAP);
+    cvShowImage("Dst",imgLogPolar);
+    cvWaitKey();
+    cvShowImage("Dst",imgInverseLogPolar);
+
+
 
 
 
@@ -593,6 +624,7 @@ int main(int argc,char** argv)
     cvReleaseImage(&img_dstRemap);
     cvReleaseImage(&src);
     cvReleaseImage(&dst);
+    cvReleaseImage(&imgLogPolar);
 
     cvReleaseMemStorage(&storage); //Libero la memoria allocata con cvCreateMemStorage
 
