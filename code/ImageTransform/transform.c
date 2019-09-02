@@ -379,6 +379,7 @@ int main(int argc,char** argv)
         https://homepages.inf.ed.ac.uk/rbf/HIPR2/affine.htm
         Spiegazione Coordinate Proiettive: http://www.sci.utah.edu/~acoste/uou/Image/project3/ArthurCOSTE_Project3.pdf
         Spiegazione trasformazioni affini semplice: http://www.frattali.it/trasformazioniaffini.htm
+        https://www.math.it/tutorial/trasformazioniGeometriche/trasformazioniGeometriche.pdf
         
         
         DENSE AFFINE TRANSFORMATION
@@ -514,6 +515,65 @@ int main(int argc,char** argv)
         still be a two-channel array.
 
     */
+
+    /* 
+        Perspective Transformation
+        
+        Dimostrazione pratica: https://www.youtube.com/watch?v=PtCQH93GucA
+
+        Per applicarlo alle immagini: cvWarpPerspective()
+
+        void cvWarpPerspective(
+            const CvArr*    src,
+            CvArr*          dst,
+            const CvMat*    map_matrix,
+            int             flags = CV_INTER_LINEAR + CV_WARP_FILL_OUTLIERS,
+            CvScalar        fillval = cvScalarAll(0)
+        );
+
+        OTTENERE LA MAP_MATRIX
+
+        CvMat* cvGetPerspectiveTransform(
+            const CvPoint2D32f*     pts_src,
+            const CvPoint2D32f*     pts_dst,
+            CvMat*                  map_matrix
+        );
+
+        Stavolta peró l'array deve essere di 4 punti
+
+
+        Per una lista di punti possiamo utilizzare
+
+        void cvPerspectiveTransform(
+            const CvArr*    src,
+            CvArr*          dst,
+            const CvMar*    mat
+        );
+    */
+
+
+   /*
+        CatToPolar and PolarToCat
+
+        void cvCartToPolar(
+            const CvArr*    x,
+            const CvArr*    y,
+            CvArr*  magnitude,
+            CvArr*  angle = NULL,
+            int angle_in_degrees = 0
+        );  
+
+        void cvPolarToCart(
+            const CvArr*    magnitude,
+            const CvArr*    angle,
+            CvArr*          x,
+            CvArr*          y,
+            int angle_in_degrees = 0
+        );
+
+   */
+
+
 
 
 
