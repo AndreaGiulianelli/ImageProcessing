@@ -1,5 +1,6 @@
 //g++ -std=c++11 transform.c `pkg-config --libs --cflags opencv` -o transform
 #include "highgui.h"
+#include <math.h>
 
 int main(int argc,char** argv)
 {
@@ -598,11 +599,14 @@ int main(int argc,char** argv)
     imgCartesian->origin = 0; //Origine nel punto top-left
     IplImage* imgLogPolar = cvCreateImage(cvGetSize(imgCartesian),imgCartesian->depth,imgCartesian->nChannels);
     IplImage* imgInverseLogPolar = cvCreateImage(cvGetSize(imgCartesian),imgCartesian->depth,imgCartesian->nChannels);
-    cvLogPolar(imgCartesian,imgLogPolar,cvPoint2D32f(0,0),50);
-    cvLogPolar(imgLogPolar,imgInverseLogPolar,cvPoint2D32f(0,0),50,CV_INTER_LINEAR | CV_WARP_INVERSE_MAP);
+    double M = 40;
+    cvLogPolar(imgCartesian,imgLogPolar,cvPoint2D32f(3*imgCartesian->width/4,imgCartesian->height/2),M,CV_INTER_LINEAR + CV_WARP_FILL_OUTLIERS);
+    cvLogPolar(imgLogPolar,imgInverseLogPolar,cvPoint2D32f(3*imgCartesian->width/4,imgCartesian->height/2),M,CV_INTER_LINEAR + CV_WARP_INVERSE_MAP);
     cvShowImage("Dst",imgLogPolar);
     cvWaitKey();
     cvShowImage("Dst",imgInverseLogPolar);
+
+    
 
 
 
